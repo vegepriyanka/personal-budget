@@ -131,18 +131,7 @@
                 datasets: [
                     {
                         data: [],
-                        backgroundColor: [
-                            '#ffcd56',
-                            '#ff6384',
-                            '#36a2eb',
-                            '#fd6b19',
-                            '#ba68c8',
-                            '#81c784',
-                            '#64b5f6',
-                            '#ffb74d',
-                            '#4bc0c0',
-                            '#9966ff'
-                        ]
+                        backgroundColor: []
                     }
                 ],
                 labels: []
@@ -157,12 +146,13 @@
         }
 
         function getBudget() {
-            axios.get('/budget')
+            axios.get('http://localhost:3000/budget')
             .then(function (res) {
                 console.log(res);
-                for (var i = 0; i < res.data.myBudget.length; i++) {
-                    dataSource.datasets[0].data[i] = res.data.myBudget[i].budget;
-                    dataSource.labels[i] = res.data.myBudget[i].title;
+                for (var i = 0; i < res.data.length; i++) {
+                    dataSource.datasets[0].data[i] = res.data[i].budget;
+                    dataSource.labels[i] = res.data[i].title;
+                    dataSource.datasets[0].backgroundColor[i] = res.data[i].color;
                 }
                 createChart();
             });
@@ -208,24 +198,17 @@
     var color ;
 
     const getD3Budget = () =>{
-        axios.get('/budget').then(function(response){
-            var budgetData = response.data.myBudget;
+        axios.get('http://localhost:3000/budget').then(function(response){
+            var budgetData = response.data;
+
+            console.log(budgetData);
 
             var budgetDataTitles = budgetData.map(budget => budget.title);
+            var budgetDataColors = budgetData.map(budget => budget.color);
 
             color = d3.scale.ordinal()
                 .domain(budgetDataTitles)
-                .range(['#ffcd56',
-                                    '#ff6384',
-                                    '#36a2eb',
-                                    '#fd6b19',
-                                    '#ba68c8',
-                                    '#81c784',
-                                    '#64b5f6',
-                                    '#ffb74d',
-                                    '#4bc0c0',
-                                    '#9966ff'
-                                ]);
+                .range(budgetDataColors);
             
             var budgetDataMapped = budgetData.map(function(budget) {
             return {label: budget.title, value: budget.budget}
